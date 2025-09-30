@@ -279,10 +279,10 @@ if __name__ == "__main__":
     data["h_mid"] = data["H"] - (2 * data["h_leg"])
     data["cv"] = data["v_leg"] - (2*data["gv"])
     data["ch"] = (data["h_mid"] - (3*data["gh"])) / 2
-    data["mh"] = 60
+    data["mh"] = 56
     data["mv"] = 5
     data["gap"] = 5
-    data["gap_m"] = 10 # data["gh"]
+    data["gap_m"] = 14 # data["gh"]
 
     data["air_material"] = "Air"
     data["core_material"] = "416 Stainless Steel"
