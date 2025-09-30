@@ -1,7 +1,8 @@
 
 import math
+import json
+
 import femm
-import matplotlib.pyplot as plt
 
 
 def number_of_turns(w, h, d):
@@ -128,24 +129,35 @@ def make_femm_geometry(cbg):
             femm.mi_addblocklabel(*obj)
 
 
-def main():
-    depth = 30
-    I = 9
-    V = 40
-    H = 80
-    h_leg = H / 3
-    v_leg = 25
-    gv = 0.5
-    gh = 0.5
-    h_mid = H - (2 * h_leg)
-    cv = v_leg - (2*gv)
-    ch = (h_mid - (3*gh)) / 2
-    mh = (H + (4*ch) + (6*gh)) / 2  
-    mv = 5
-    gap = 3
-    gap_m = gh
+def main(data):
+    """
+        data = {}
+        data["battery_I"] = 15
+        data["battery_V"] = 48
+        data["battery_P"] = data["battery_I"] * data["battery_V"]
 
-    n_turns = number_of_turns(ch, cv, 0.315)
+        data["depth"] = 30
+        data["V"] = 40
+        data["H"] = 80
+        data["h_leg"] = data["H"] / 3
+        data["v_leg"] = 25
+        data["gv"] = 0.5
+        data["gh"] = 0.5
+        data["h_mid"] = data["H"] - (2 * data["h_leg"])
+        data["cv"] = data["v_leg"] - (2*data["gv"])
+        data["ch"] = (data["h_mid"] - (3*data["gh"])) / 2
+        data["mh"] = (data["H"] + (4*data["ch"]) + (6*data["gh"])) / 2  
+        data["mv"] = 5
+        data["gap"] = 3
+        data["gap_m"] = data["gh"]
+
+        data["air_material"] = "Air"
+        data["core_material"] = "416 Stainless Steel"
+        data["magnet_material"] = "N52"
+        data["coil_material"] = "0.315mm"
+
+        data["n_turns"] = number_of_turns(data["ch"], data["cv"], 0.315)
+    """
 
 
     # The package must be initialized with the openfemm command.
@@ -157,53 +169,54 @@ def main():
     # Define the problem type.  Magnetostatic; Units of mm; Axisymmetric; 
     # Precision of 10^(-8) for the linear solver; a placeholder of 0 for 
     # the depth dimension, and an angle mesh constraint of 30 degrees
-    femm.mi_probdef(0, 'millimeters', 'planar', 1e-8, depth, 30)
+    femm.mi_probdef(0, 'millimeters', 'planar', 1e-8, data["depth"], 30)
 
-    femm.mi_getmaterial("Air")      
-    femm.mi_getmaterial("416 Stainless Steel")
-    femm.mi_getmaterial("N52")
-    femm.mi_getmaterial("0.315mm")
+    femm.mi_getmaterial(data["air_material"])      
+    femm.mi_getmaterial(data["core_material"])
+    femm.mi_getmaterial(data["magnet_material"])
+    femm.mi_getmaterial(data["coil_material"])
 
     # mi_addcircprop(’circuitname’, i, circuittype) adds a new 
     # circuit property with name
     # ’circuitname’ with a prescribed current. The circuittype 
     # parameter is 0 for a parallelconnected circuit and 1 for a 
     # series-connected circuit.
-    femm.mi_addcircprop('icoil', I, 1)
+    femm.mi_addcircprop('icoil', data["battery_I"], 1)
 
-    cbg = c_block_geometry(V, H, h_leg, v_leg, gv, gh, h_mid, cv, ch, mh, mv, gap, gap_m)
+    cbg = c_block_geometry(data["V"], data["H"], data["h_leg"], data["v_leg"], data["gv"], data["gh"], 
+        data["h_mid"], data["cv"], data["ch"], data["mh"], data["mv"], data["gap"], data["gap_m"])
 
     make_femm_geometry(cbg)
 
     femm.mi_selectlabel(*cbg["air_label"])
-    femm.mi_setblockprop("Air", 0, 1, '<None>', 0, 0, 0)
+    femm.mi_setblockprop(data["air_material"], 0, 1, '<None>', 0, 0, 0)
     femm.mi_clearselected()
 
     femm.mi_selectlabel(*cbg["core_top_label"])
     femm.mi_selectlabel(*cbg["core_bttm_label"])
-    femm.mi_setblockprop("416 Stainless Steel", 0, 1, '<None>', 0, 0, 0)
+    femm.mi_setblockprop(data["core_material"], 0, 1, '<None>', 0, 0, 0)
     femm.mi_clearselected()
 
     femm.mi_selectlabel(*cbg["magn_left_label"])
-    femm.mi_setblockprop("N52", 0, 1, '<None>', 0, 0, 0)
+    femm.mi_setblockprop(data["magnet_material"], 0, 1, '<None>', 0, 0, 0)
     femm.mi_clearselected()
 
     femm.mi_selectlabel(*cbg["magn_right_label"])
-    femm.mi_setblockprop("N52", 0, 1, '<None>', 180, 0, 0)
+    femm.mi_setblockprop(data["magnet_material"], 0, 1, '<None>', 180, 0, 0)
     femm.mi_clearselected()
 
     femm.mi_selectlabel(*cbg["coil_top_1_label"])
     femm.mi_selectlabel(*cbg["coil_top_4_label"])
     femm.mi_selectlabel(*cbg["coil_bttm_2_label"])
     femm.mi_selectlabel(*cbg["coil_bttm_3_label"])
-    femm.mi_setblockprop("0.315mm", 0, 1, 'icoil', 0, 0, n_turns)
+    femm.mi_setblockprop(data["coil_material"], 0, 1, 'icoil', 0, 0, - data["n_turns"])
     femm.mi_clearselected()
 
     femm.mi_selectlabel(*cbg["coil_top_2_label"])
     femm.mi_selectlabel(*cbg["coil_top_3_label"])
     femm.mi_selectlabel(*cbg["coil_bttm_1_label"])
     femm.mi_selectlabel(*cbg["coil_bttm_4_label"])
-    femm.mi_setblockprop("0.315mm", 0, 1, 'icoil', 0, 0, - n_turns)
+    femm.mi_setblockprop(data["coil_material"], 0, 1, 'icoil', 0, 0, data["n_turns"])
     femm.mi_clearselected()
 
 
@@ -213,47 +226,93 @@ def main():
     # We have to give the geometry a name before we can analyze it.
     femm.mi_saveas('c_magnets.fem');
 
-
-    # Now,analyze the problem and load the solution when the analysis is finished
-    femm.mi_analyze()
+    # femm.mi_createmesh()
+    femm.mi_analyze(0)
     femm.mi_loadsolution()
 
-    # # If we were interested in the flux density at specific positions, 
-    # # we could inquire at specific points directly:
-    # b0=femm.mo_getb(0,0);
-    # print('Flux density at the center of the bar is %g T' % b0[1]);
-    # b1=femm.mo_getb(0,50);
-    # print('Flux density at r=0,z=50 is %g T' % b1[1]);
 
-    # # The program will report the terminal properties of the circuit:
-    # # current, voltage, and flux linkage 
-    # vals = femm.mo_getcircuitproperties('icoil');
+    # The program will report the terminal properties of the circuit:
+    # current, voltage, and flux linkage 
+    vals = femm.mo_getcircuitproperties('icoil')
+    result = {}
+    result["V_drop"] = vals[1]
+    result["I_out"] = vals[0]
+    result["P_out"] = result["V_drop"] * result["I_out"]
+    result["battery_P"] =  data["battery_V"] * result["I_out"]
 
-    # # [i, v, \[Phi]] = MOGetCircuitProperties["icoil"]
+    femm.mo_seteditmode("area")
 
-    # # If we were interested in inductance, it could be obtained by
-    # # dividing flux linkage by current
-    # L = 1000*vals[2]/vals[0];
-    # print('The self-inductance of the coil is %g mH' % L);
+    femm.mo_clearblock()
 
-    # # Or we could, for example, plot the results along a line using 
-    # zee=[]
-    # bee=[]
-    # for n in range(-100,101):
-    #     b=femm.mo_getb(0,n);
-    #     zee.append(n)
-    #     bee.append(b[1]);
+    femm.mo_selectblock(*cbg["magn_left_label"])
+    femm.mo_selectblock(*cbg["magn_right_label"])
 
-    # plt.plot(zee,bee)
-    # plt.ylabel('Flux Density, Tesla')
-    # plt.xlabel('Distance along the z-axis, mm')
-    # plt.title('Plot of flux density along the axis')
-    # plt.show()
+    result["Fx"] = femm.mo_blockintegral(18)  # x-direction force
+    result["battery_Fx"] =  (data["battery_V"] * result["Fx"]) / result["V_drop"]
+    result["magnet_on_wheel_weight"] =  data["depth"] * data["mh"] * data["mv"] * data["magnet_density"] * (32 - 1)
 
     # When the analysis is completed, FEMM can be shut down.
     femm.closefemm()
 
+    print("Input data:")
+    print(json.dumps(data, indent=4))
+    print("")
+    print("Results:")
+    print(json.dumps(result, indent=4))
+
+    return result
 
 
 if __name__ == "__main__":
-    main()
+    data = {}
+    data["battery_I"] = 15
+    data["battery_V"] = 48
+    data["battery_P"] = data["battery_I"] * data["battery_V"]
+
+    data["depth"] = 40
+    data["V"] = 40
+    data["H"] = 80
+    data["h_leg"] = data["H"] / 4
+    data["v_leg"] = 25
+    data["gv"] = 0.5
+    data["gh"] = 0.5
+    data["h_mid"] = data["H"] - (2 * data["h_leg"])
+    data["cv"] = data["v_leg"] - (2*data["gv"])
+    data["ch"] = (data["h_mid"] - (3*data["gh"])) / 2
+    data["mh"] = 60
+    data["mv"] = 5
+    data["gap"] = 5
+    data["gap_m"] = 10 # data["gh"]
+
+    data["air_material"] = "Air"
+    data["core_material"] = "416 Stainless Steel"
+    data["magnet_material"] = "N52"
+    # data["coil_material"] = "0.25mm"
+    # data["coil_material"] = "0.315mm"
+    # data["coil_material"] = "0.4mm"
+    # data["coil_material"] = "0.5mm"
+    # data["coil_material"] = "0.63mm"
+    data["coil_material"] = "0.8mm"
+    # data["coil_material"] = "1mm"
+    # data["coil_material"] = "1.25mm"
+    # data["coil_material"] = "1.6mm"
+
+    data["n_turns"] = number_of_turns(data["ch"], data["cv"], 0.8)
+
+
+    data["magnet_density"] = 7.5 / 1000
+
+    result = main(data)
+
+    # r = {}
+
+    # for wire_d in [0.25, 0.315, 0.4, 0.5, 0.63, 0.8, 1, 1.25, 1.6]:
+    #     data["coil_material"] = f"{wire_d}mm"
+    #     data["n_turns"] = number_of_turns(data["ch"], data["cv"], wire_d)
+    #     result = main(data)
+    #     r[wire_d] = {"Fx": min([result["Fx"], result["battery_Fx"]]),
+    #     "P": min([result["P_out"], result["battery_P"]])}
+
+    # print("")
+    # print("Total Results:")
+    # print(json.dumps(r, indent=4))
