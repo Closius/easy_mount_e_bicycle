@@ -46,12 +46,12 @@ Input data:
 
 Results:
 {
-    "V_drop": 39.51433069867749,
-    "I_out": 5,
-    "P_out": 197.57165349338746,
-    "battery_P": 240,
-    "Fx": 112.9870438649618,
-    "battery_Fx": 137.25091655670337,
+    "V_drop (2 magnets)": 39.51433069867749,
+    "I_out (2 magnets)": 5,
+    "P_out (2 magnets)": 197.57165349338746,
+    "battery_P (2 magnets)": 240,
+    "Fx (2 magnets)": 112.9870438649618,
+    "battery_Fx (2 magnets)": 137.25091655670337,
     "magnet_on_wheel_weight (31 items) (kg)": 2.604,
     "U_core_weight (6 items) (kg)": 4.118399999999999,
     "coil_weight (12 items) (kg) calculated as solid block": 9.98452224,
