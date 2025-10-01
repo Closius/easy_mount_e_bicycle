@@ -249,7 +249,7 @@ def main(data):
 
     result["Fx"] = femm.mo_blockintegral(18)  # x-direction force
     result["battery_Fx"] =  (data["battery_V"] * result["Fx"]) / result["V_drop"]
-    result["magnet_on_wheel_weight (kg)"] =  data["depth"] * data["mh"] * data["mv"] * data["magnet_density"] * (32 - 1) / 1000
+    result["magnet_on_wheel_weight (31 items) (kg)"] =  data["depth"] * data["mh"] * data["mv"] * data["magnet_density"] * (32 - 1) / 1000
     result["U_core_weight (6 items) (kg)"] =  ((data["depth"] * data["V"] * data["H"]) - 
         (data["depth"] * data["v_leg"] * data["h_mid"])) * data["iron_density"] * 6 / 1000
     result["coil_weight (12 items) (kg) calculated as solid block"] = ((
