@@ -1,6 +1,8 @@
 easy_mount_e_bicycle
 ====================
 
+![general idea](./idea.jpg)
+
 Parametric calculation of the rim based linear engine for turning normal bicycle to e-bicycle
 
 `c_magnets.py` uses following dimentions:
