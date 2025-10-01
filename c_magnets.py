@@ -249,7 +249,13 @@ def main(data):
 
     result["Fx"] = femm.mo_blockintegral(18)  # x-direction force
     result["battery_Fx"] =  (data["battery_V"] * result["Fx"]) / result["V_drop"]
-    result["magnet_on_wheel_weight"] =  data["depth"] * data["mh"] * data["mv"] * data["magnet_density"] * (32 - 1)
+    result["magnet_on_wheel_weight (kg)"] =  data["depth"] * data["mh"] * data["mv"] * data["magnet_density"] * (32 - 1) / 1000
+    result["U_core_weight (6 items) (kg)"] =  ((data["depth"] * data["V"] * data["H"]) - 
+        (data["depth"] * data["v_leg"] * data["h_mid"])) * data["iron_density"] * 6 / 1000
+    result["coil_weight (12 items) (kg) calculated as solid block"] = ((
+        (data["h_leg"] + (2*data["gh"]) + (2*data["ch"])) * (data["depth"] + (2*data["gh"]) + (2*data["ch"]))) -
+        ((data["h_leg"] + (2*data["gh"])) * (data["depth"] + (2*data["gh"])))) * data["cv"] * data["copper_density"] * 12 / 1000
+    result["total weight (kg)"] = result["magnet_on_wheel_weight (kg)"] + result["U_core_weight (6 items) (kg)"] + result["coil_weight (12 items) (kg) calculated as solid block"]
 
     # When the analysis is completed, FEMM can be shut down.
     femm.closefemm()
@@ -265,7 +271,7 @@ def main(data):
 
 if __name__ == "__main__":
     data = {}
-    data["battery_I"] = 15
+    data["battery_I"] = 5
     data["battery_V"] = 48
     data["battery_P"] = data["battery_I"] * data["battery_V"]
 
@@ -286,7 +292,9 @@ if __name__ == "__main__":
 
     data["air_material"] = "Air"
     data["core_material"] = "416 Stainless Steel"
-    data["magnet_material"] = "N52"
+    # data["magnet_material"] = "N52"
+    data["magnet_material"] = "N40"
+    # data["magnet_material"] = "N30"
     # data["coil_material"] = "0.25mm"
     # data["coil_material"] = "0.315mm"
     # data["coil_material"] = "0.4mm"
@@ -301,6 +309,8 @@ if __name__ == "__main__":
 
 
     data["magnet_density"] = 7.5 / 1000
+    data["iron_density"] = 7.8 / 1000
+    data["copper_density"] = 8.96 / 1000
 
     result = main(data)
 
