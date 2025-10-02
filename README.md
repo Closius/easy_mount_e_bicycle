@@ -37,26 +37,62 @@ Input data:
     "air_material": "Air",
     "core_material": "416 Stainless Steel",
     "magnet_material": "N40",
-    "coil_material": "0.8mm",
+    "coil_material": [
+        "Aluminium 0.8mm",
+        [
+            1,
+            1,
+            0,
+            10,
+            35,
+            0.03,
+            0,
+            0,
+            3,
+            0,
+            0,
+            1,
+            0.8
+        ]
+    ],
     "n_turns": 720,
     "magnet_density": 0.0075,
     "iron_density": 0.0078,
-    "copper_density": 0.008960000000000001
+    "coil_mat_density": 0.0027,
+    "coil_mat_specific_heat": 910
 }
 
 Results:
 {
-    "V_drop (2 magnets)": 39.51433069867749,
-    "I_out (2 magnets)": 5,
-    "P_out (2 magnets)": 197.57165349338746,
-    "battery_P (2 magnets)": 240,
-    "Fx (2 magnets)": 112.9870438649618,
-    "battery_Fx (2 magnets)": 137.25091655670337,
-    "magnet_on_wheel_weight (31 items) (kg)": 2.604,
-    "U_core_weight (6 items) (kg)": 4.118399999999999,
-    "coil_weight (12 items) (kg) calculated as solid block": 9.98452224,
-    "total weight (kg)": 16.70692224
+    "From calculation (Unlimited battery)": {
+        "V_drop": 65.48089087209405,
+        "I": 5,
+        "P": 327.40445436047025,
+        "Fx": 112.9870438649618,
+        "delta T for 60sec 1 coil (vacuum)": 86.09791702426669
+    },
+    "Limited by battery": {
+        "V": 48,
+        "I": 5,
+        "P": 240,
+        "Fx": 82.82382895663143,
+        "delta T for 60sec 1 coil (vacuum)": 63.11306950965799
+    },
+    "Weights": {
+        "magnet_on_wheel_weight (for 32 spokes) (kg)": 2.604,
+        "U_core_weight (6 items) (kg)": 4.1184,
+        "coil_weight (12 items) (kg) calculated as solid block": 3.0087288000000005,
+        "total witout battery (kg)": 9.7311288
+    }
 }
+
+
+                     Regular torque      Medium torque                   High torque
+Measurements         40-60Nm             60-80Nm                         80Nm+
+Force (28", rim)    148-222             222-296                         296+
+Feel                 Normal              Punchy                          POWERRR!!
+Battery impact       Normal              Minimal impact over normal      Higher, but battery spec compensates
+Best for             Commuting, leisure  More oomph,heavier work         Off-roading, cargo, fun
 ```
 
 

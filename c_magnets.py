@@ -129,6 +129,10 @@ def make_femm_geometry(cbg):
             femm.mi_addblocklabel(*obj)
 
 
+def create_material(name, properties: dict):
+    femm.mi_addmaterial(name, *properties)
+
+
 def main(data):
     """
         data = {}
@@ -171,10 +175,16 @@ def main(data):
     # the depth dimension, and an angle mesh constraint of 30 degrees
     femm.mi_probdef(0, 'millimeters', 'planar', 1e-8, data["depth"], 30)
 
-    femm.mi_getmaterial(data["air_material"])      
+    femm.mi_getmaterial(data["air_material"])
     femm.mi_getmaterial(data["core_material"])
     femm.mi_getmaterial(data["magnet_material"])
-    femm.mi_getmaterial(data["coil_material"])
+
+    if isinstance(data["coil_material"], str):
+        femm.mi_getmaterial(data["coil_material"])
+        mat_coil_name = data["coil_material"]
+    else:
+        create_material(*data["coil_material"])
+        mat_coil_name = data["coil_material"][0]
 
     # mi_addcircprop(’circuitname’, i, circuittype) adds a new 
     # circuit property with name
@@ -209,14 +219,14 @@ def main(data):
     femm.mi_selectlabel(*cbg["coil_top_4_label"])
     femm.mi_selectlabel(*cbg["coil_bttm_2_label"])
     femm.mi_selectlabel(*cbg["coil_bttm_3_label"])
-    femm.mi_setblockprop(data["coil_material"], 0, 1, 'icoil', 0, 0, - data["n_turns"])
+    femm.mi_setblockprop(mat_coil_name, 0, 1, 'icoil', 0, 0, - data["n_turns"])
     femm.mi_clearselected()
 
     femm.mi_selectlabel(*cbg["coil_top_2_label"])
     femm.mi_selectlabel(*cbg["coil_top_3_label"])
     femm.mi_selectlabel(*cbg["coil_bttm_1_label"])
     femm.mi_selectlabel(*cbg["coil_bttm_4_label"])
-    femm.mi_setblockprop(data["coil_material"], 0, 1, 'icoil', 0, 0, data["n_turns"])
+    femm.mi_setblockprop(mat_coil_name, 0, 1, 'icoil', 0, 0, data["n_turns"])
     femm.mi_clearselected()
 
 
@@ -235,10 +245,10 @@ def main(data):
     # current, voltage, and flux linkage 
     vals = femm.mo_getcircuitproperties('icoil')
     result = {}
-    result["V_drop"] = vals[1]
-    result["I_out"] = vals[0]
-    result["P_out"] = result["V_drop"] * result["I_out"]
-    result["battery_P"] =  data["battery_V"] * result["I_out"]
+    V_drop = vals[1]
+    I_out = vals[0]
+    P_out = V_drop * I_out
+    battery_P = data["battery_V"] * I_out
 
     femm.mo_seteditmode("area")
 
@@ -247,15 +257,40 @@ def main(data):
     femm.mo_selectblock(*cbg["magn_left_label"])
     femm.mo_selectblock(*cbg["magn_right_label"])
 
-    result["Fx"] = femm.mo_blockintegral(18)  # x-direction force
-    result["battery_Fx"] =  (data["battery_V"] * result["Fx"]) / result["V_drop"]
-    result["magnet_on_wheel_weight (31 items) (kg)"] =  data["depth"] * data["mh"] * data["mv"] * data["magnet_density"] * (32 - 1) / 1000
-    result["U_core_weight (6 items) (kg)"] =  ((data["depth"] * data["V"] * data["H"]) - 
-        (data["depth"] * data["v_leg"] * data["h_mid"])) * data["iron_density"] * 6 / 1000
-    result["coil_weight (12 items) (kg) calculated as solid block"] = ((
+    Fx = femm.mo_blockintegral(18)  # x-direction force
+    battery_Fx =  (data["battery_V"] * Fx) / V_drop
+    magnet_on_wheel_weight =  data["depth"] * data["mh"] * data["mv"] * data["magnet_density"] / 1000
+    U_core_weight =  ((data["depth"] * data["V"] * data["H"]) - 
+        (data["depth"] * data["v_leg"] * data["h_mid"])) * data["iron_density"] / 1000
+    coil_weight = ((
         (data["h_leg"] + (2*data["gh"]) + (2*data["ch"])) * (data["depth"] + (2*data["gh"]) + (2*data["ch"]))) -
-        ((data["h_leg"] + (2*data["gh"])) * (data["depth"] + (2*data["gh"])))) * data["cv"] * data["copper_density"] * 12 / 1000
-    result["total weight (kg)"] = result["magnet_on_wheel_weight (kg)"] + result["U_core_weight (6 items) (kg)"] + result["coil_weight (12 items) (kg) calculated as solid block"]
+        ((data["h_leg"] + (2*data["gh"])) * (data["depth"] + (2*data["gh"])))) * data["cv"] * data["coil_mat_density"] / 1000
+
+    # temp of coil in 1 seconds
+    delta_T_1sec_P_out = (P_out / (coil_weight * data["coil_mat_specific_heat"]))
+    delta_T_1sec_battery_P = (battery_P / (coil_weight * data["coil_mat_specific_heat"]))
+
+
+    result["From calculation (Unlimited battery)"] = {
+        "V_drop": V_drop,
+        "I": I_out,
+        "P": P_out,
+        "Fx": Fx,
+        "delta T for 60sec 1 coil (vacuum)": delta_T_1sec_P_out * 60,
+    }
+    result["Limited by battery"] = {
+        "V": data["battery_V"],
+        "I": data["battery_I"],
+        "P": data["battery_P"],
+        "Fx": battery_Fx,
+        "delta T for 60sec 1 coil (vacuum)": delta_T_1sec_battery_P * 60
+    }
+    result["Weights"] = {
+        "magnet_on_wheel_weight (for 32 spokes) (kg)": magnet_on_wheel_weight * (32 - 1),
+        "U_core_weight (6 items) (kg)": U_core_weight * 6,
+        "coil_weight (12 items) (kg) calculated as solid block": coil_weight * 12,
+        "total witout battery (kg)": (magnet_on_wheel_weight * (32 - 1)) + (U_core_weight * 6) + (coil_weight * 12)
+    }
 
     # When the analysis is completed, FEMM can be shut down.
     femm.closefemm()
@@ -265,6 +300,15 @@ def main(data):
     print("")
     print("Results:")
     print(json.dumps(result, indent=4))
+    print("")
+    print("")
+    print("                     Regular torque      Medium torque                   High torque")
+    print("Measurements         40-60Nm             60-80Nm                         80Nm+")
+    print("Force (28\", rim)    148-222             222-296                         296+")
+    print("Feel                 Normal              Punchy                          POWERRR!!")
+    print("Battery impact       Normal              Minimal impact over normal      Higher, but battery spec compensates")
+    print("Best for             Commuting, leisure  More oomph,heavier work         Off-roading, cargo, fun")
+
 
     return result
 
@@ -300,17 +344,45 @@ if __name__ == "__main__":
     # data["coil_material"] = "0.4mm"
     # data["coil_material"] = "0.5mm"
     # data["coil_material"] = "0.63mm"
-    data["coil_material"] = "0.8mm"
+    # data["coil_material"] = "0.8mm"
     # data["coil_material"] = "1mm"
     # data["coil_material"] = "1.25mm"
     # data["coil_material"] = "1.6mm"
+
+    data["coil_material"] = ["Aluminium 0.8mm", [
+                        1,  # mu x, 1 for non-magnetic
+                        1,  # mu y, 1 for non-magnetic
+                        0,  # coercivity (Hc), 0 for non-magnetic
+                        10, # J Applied source current density in Amps/mm2
+                        35,  # Cduct Electrical conductivity of the material in MS/m.
+                        0.03,  # lam_d (for lamination, 0 if not laminated)
+                        0,  # Phi hmax Hysteresis lag angle in degrees, used for nonlinear BH curves
+                        0,  # Lam fill Fraction of the volume occupied per lamination that is actually filled with iron (Note
+                            # that this parameter defaults to 1 in the femm preprocessor dialog box because, by default,
+                            # iron completely fills the volume)
+                        3,  # Lamtype Set to
+                                # ∗ 0 – Not laminated or laminated in plane
+                                # ∗ 1 – laminated x or r
+                                # ∗ 2 – laminated y or z
+                                # ∗ 3 – magnet wire
+                                # ∗ 4 – plain stranded wire
+                                # ∗ 5 – Litz wire
+                                # ∗ 6 – square wire
+                        0, # Phi hx Hysteresis lag in degrees in the x-direction for linear problems.
+                        0, # Phi hy Hysteresis lag in degrees in the y-direction for linear problems.
+                        1, # nstr Number of strands in the wire build. Should be 1 for Magnet or Square wire.
+                        0.8, # dwire Diameter of each of the wire’s constituent strand in millimeters.
+    ]]
 
     data["n_turns"] = number_of_turns(data["ch"], data["cv"], 0.8)
 
 
     data["magnet_density"] = 7.5 / 1000
     data["iron_density"] = 7.8 / 1000
-    data["copper_density"] = 8.96 / 1000
+    data["coil_mat_density"] = 2.7 / 1000  # aluminium
+    # data["coil_mat_density"] = 8.96 / 1000  # copper
+    data["coil_mat_specific_heat"] = 910 # Dj/(kg*K)   Aluminium
+    # data["coil_mat_specific_heat"] = 385 # Dj/(kg*K)   Copper
 
     result = main(data)
 
