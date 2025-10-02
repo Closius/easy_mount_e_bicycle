@@ -271,6 +271,18 @@ def main(data):
     delta_T_1sec_battery_P = (battery_P / (coil_weight * data["coil_mat_specific_heat"]))
 
 
+
+    def _round_floats(obj):
+        if isinstance(obj, float):
+            return round(obj, 2)
+        elif isinstance(obj, dict):
+            return {k: _round_floats(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [_round_floats(elem) for elem in obj]
+        else:
+            return obj
+
+
     result["From calculation (Unlimited battery)"] = {
         "V_drop": V_drop,
         "I": I_out,
@@ -299,7 +311,7 @@ def main(data):
     print(json.dumps(data, indent=4))
     print("")
     print("Results:")
-    print(json.dumps(result, indent=4))
+    print(json.dumps(_round_floats(result), indent=4))
     print("")
     print("")
     print("                     Regular torque      Medium torque                   High torque")

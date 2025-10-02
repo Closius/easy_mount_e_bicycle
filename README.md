@@ -65,24 +65,24 @@ Input data:
 Results:
 {
     "From calculation (Unlimited battery)": {
-        "V_drop": 65.48089087209405,
+        "V_drop": 65.48,
         "I": 5,
-        "P": 327.40445436047025,
-        "Fx": 112.9870438649618,
-        "delta T for 60sec 1 coil (vacuum)": 86.09791702426669
+        "P": 327.4,
+        "Fx": 112.99,
+        "delta T for 60sec 1 coil (vacuum)": 86.1
     },
     "Limited by battery": {
         "V": 48,
         "I": 5,
         "P": 240,
-        "Fx": 82.82382895663143,
-        "delta T for 60sec 1 coil (vacuum)": 63.11306950965799
+        "Fx": 82.82,
+        "delta T for 60sec 1 coil (vacuum)": 63.11
     },
     "Weights": {
-        "magnet_on_wheel_weight (for 32 spokes) (kg)": 2.604,
-        "U_core_weight (6 items) (kg)": 4.1184,
-        "coil_weight (12 items) (kg) calculated as solid block": 3.0087288000000005,
-        "total witout battery (kg)": 9.7311288
+        "magnet_on_wheel_weight (for 32 spokes) (kg)": 2.6,
+        "U_core_weight (6 items) (kg)": 4.12,
+        "coil_weight (12 items) (kg) calculated as solid block": 3.01,
+        "total witout battery (kg)": 9.73
     }
 }
 
