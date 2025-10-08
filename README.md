@@ -17,7 +17,7 @@ Results
 ```
 Input data:
 {
-    "battery_I": 1.25,
+    "battery_I": 1.25, // 15/12 parallel coils connection
     "battery_V": 48,
     "battery_P": 60.0,
     "depth": 31.7,
@@ -37,7 +37,7 @@ Input data:
     "air_material": "Air",
     "core_material": "416 Stainless Steel",
     "magnet_material": "N40",
-    "coil_material": "0.8mm",
+    "coil_material": "0.8mm",  // copper
     "n_turns": 560,
     "magnet_density": 0.0075,
     "core_density": 0.0078,
