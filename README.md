@@ -17,72 +17,55 @@ Results
 ```
 Input data:
 {
-    "battery_I": 5,
+    "battery_I": 1.25,
     "battery_V": 48,
-    "battery_P": 240,
-    "depth": 40,
+    "battery_P": 60.0,
+    "depth": 31.7,
     "V": 40,
-    "H": 80,
-    "h_leg": 20.0,
+    "H": 79.8,
+    "h_leg": 22.3,
     "v_leg": 25,
-    "gv": 0.5,
-    "gh": 0.5,
-    "h_mid": 40.0,
-    "cv": 24.0,
-    "ch": 19.25,
-    "mh": 56,
+    "gv": 1.0,
+    "gh": 1.0,
+    "h_mid": 35.199999999999996,
+    "cv": 23.0,
+    "ch": 16.099999999999998,
+    "mh": 44,
     "mv": 5,
     "gap": 5,
     "gap_m": 14,
     "air_material": "Air",
     "core_material": "416 Stainless Steel",
     "magnet_material": "N40",
-    "coil_material": [
-        "Aluminium 0.8mm",
-        [
-            1,
-            1,
-            0,
-            10,
-            35,
-            0.03,
-            0,
-            0,
-            3,
-            0,
-            0,
-            1,
-            0.8
-        ]
-    ],
-    "n_turns": 720,
+    "coil_material": "0.8mm",
+    "n_turns": 560,
     "magnet_density": 0.0075,
-    "iron_density": 0.0078,
-    "coil_mat_density": 0.0027,
-    "coil_mat_specific_heat": 910
+    "core_density": 0.0078,
+    "coil_mat_density": 0.008960000000000001,
+    "coil_mat_specific_heat": 385
 }
 
 Results:
 {
     "From calculation (Unlimited battery)": {
-        "V_drop": 65.48,
-        "I": 5,
-        "P": 327.4,
-        "Fx": 112.99,
-        "delta T for 60sec 1 coil (vacuum)": 86.1
+        "V_drop": 18.27,
+        "I": 1.25,
+        "P": 22.83,
+        "Fx": 75.36,
+        "delta T for 60sec 1 coil (vacuum)": 5.95
     },
     "Limited by battery": {
         "V": 48,
-        "I": 5,
-        "P": 240,
-        "Fx": 82.82,
-        "delta T for 60sec 1 coil (vacuum)": 63.11
+        "I": 1.25,
+        "P": 60.0,
+        "Fx": 198.01,
+        "delta T for 60sec 1 coil (vacuum)": 15.62
     },
     "Weights": {
-        "magnet_on_wheel_weight (for 32 spokes) (kg)": 2.6,
-        "U_core_weight (6 items) (kg)": 4.12,
-        "coil_weight (12 items) (kg) calculated as solid block": 3.01,
-        "total witout battery (kg)": 9.73
+        "magnet_on_wheel_weight (for 32 spokes) (kg)": 1.62,
+        "U_core_weight (6 items) (kg)": 3.43,
+        "coil_weight (12 items) (kg) calculated as solid block": 7.18,
+        "total witout battery (kg)": 12.23
     }
 }
 

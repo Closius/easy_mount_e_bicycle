@@ -1,5 +1,6 @@
 
 import math
+import copy
 import json
 
 import femm
@@ -36,7 +37,7 @@ def c_block_geometry(V, H, h_leg, v_leg, gv, gh, h_mid, cv, ch, mh, mv, gap, gap
         (mh, 0),   # 4
     ]
     air = [
-        (- ((H/2) + ch) * 2.5, - (mv + gap + V) * 2.5)
+        (- ((H/2) + ch) * 3 * 1.5, - (mv + gap + V) * 3)
     ]
     air.append((air[0][0], abs(air[0][1])))
     air.append((abs(air[0][0]), abs(air[0][1])))
@@ -230,6 +231,42 @@ def main(data):
     femm.mi_clearselected()
 
 
+    # mirror objects
+
+    x_m = ((data["H"]/2) + data["ch"] + (1.5 * data["gh"]))
+    y_m = (data["mv"] / 2) + data["gap"] + data["V"] + data["gv"]
+
+    # femm.mi_selectlabel(*cbg["core_top_label"])
+    # femm.mi_selectlabel(*cbg["core_bttm_label"])
+    # femm.mi_selectlabel(*cbg["magn_left_label"])
+    # femm.mi_selectlabel(*cbg["magn_right_label"])
+    # femm.mi_selectlabel(*cbg["coil_top_1_label"])
+    # femm.mi_selectlabel(*cbg["coil_top_4_label"])
+    # femm.mi_selectlabel(*cbg["coil_bttm_2_label"])
+    # femm.mi_selectlabel(*cbg["coil_bttm_3_label"])
+    # femm.mi_selectlabel(*cbg["coil_top_2_label"])
+    # femm.mi_selectlabel(*cbg["coil_top_3_label"])
+    # femm.mi_selectlabel(*cbg["coil_bttm_1_label"])
+    # femm.mi_selectlabel(*cbg["coil_bttm_4_label"])
+
+    # femm.mi_mirror(x_m, - y_m, x_m, y_m)
+    # femm.mi_mirror(- x_m, - y_m, - x_m, y_m)
+    # femm.mi_clearselected()
+
+    # all
+    femm.mi_selectrectangle(- x_m,y_m,x_m,- y_m,4)
+    femm.mi_mirror2(x_m, - y_m, x_m, y_m,1)
+    femm.mi_clearselected()
+    femm.mi_selectrectangle(- x_m,y_m,x_m,- y_m,4)
+    femm.mi_mirror2(x_m, - y_m, x_m, y_m,2)
+    femm.mi_clearselected()
+    femm.mi_selectrectangle(- x_m,y_m,x_m,- y_m,4)
+    femm.mi_mirror2(- x_m, - y_m, - x_m, y_m,1)
+    femm.mi_clearselected()
+    femm.mi_selectrectangle(- x_m,y_m,x_m,- y_m,4)
+    femm.mi_mirror2(- x_m, - y_m, - x_m, y_m,2)
+    femm.mi_clearselected()
+
     # Now, the finished input geometry can be displayed.
     femm.mi_zoomnatural()
 
@@ -257,11 +294,26 @@ def main(data):
     femm.mo_selectblock(*cbg["magn_left_label"])
     femm.mo_selectblock(*cbg["magn_right_label"])
 
+    m_right_1 = list(copy.deepcopy(cbg["magn_right_label"]))
+    m_right_1[0] = x_m + (x_m - m_right_1[0])
+    m_right_2 = list(copy.deepcopy(cbg["magn_left_label"]))
+    m_right_2[0] = x_m + x_m + abs(m_right_2[0])
+    femm.mo_selectblock(*m_right_1)
+    femm.mo_selectblock(*m_right_2)
+
+    m_left_1 = copy.deepcopy(m_right_1)
+    m_left_1[0] = - m_left_1[0]
+    m_left_2 = copy.deepcopy(m_right_2)
+    m_left_2[0] = - m_left_2[0]
+    femm.mo_selectblock(*m_left_1)
+    femm.mo_selectblock(*m_left_2)
+
+
     Fx = femm.mo_blockintegral(18)  # x-direction force
     battery_Fx =  (data["battery_V"] * Fx) / V_drop
     magnet_on_wheel_weight =  data["depth"] * data["mh"] * data["mv"] * data["magnet_density"] / 1000
     U_core_weight =  ((data["depth"] * data["V"] * data["H"]) - 
-        (data["depth"] * data["v_leg"] * data["h_mid"])) * data["iron_density"] / 1000
+        (data["depth"] * data["v_leg"] * data["h_mid"])) * data["core_density"] / 1000
     coil_weight = ((
         (data["h_leg"] + (2*data["gh"]) + (2*data["ch"])) * (data["depth"] + (2*data["gh"]) + (2*data["ch"]))) -
         ((data["h_leg"] + (2*data["gh"])) * (data["depth"] + (2*data["gh"])))) * data["cv"] * data["coil_mat_density"] / 1000
@@ -327,27 +379,28 @@ def main(data):
 
 if __name__ == "__main__":
     data = {}
-    data["battery_I"] = 5
+    data["battery_I"] = 15/12
     data["battery_V"] = 48
     data["battery_P"] = data["battery_I"] * data["battery_V"]
 
-    data["depth"] = 40
+    data["depth"] = 31.7
     data["V"] = 40
-    data["H"] = 80
-    data["h_leg"] = data["H"] / 4
+    data["H"] = 79.8
+    data["h_leg"] = 22.3 # (data["H"] / 4)
     data["v_leg"] = 25
-    data["gv"] = 0.5
-    data["gh"] = 0.5
+    data["gv"] = 1.0
+    data["gh"] = 1.0
     data["h_mid"] = data["H"] - (2 * data["h_leg"])
     data["cv"] = data["v_leg"] - (2*data["gv"])
     data["ch"] = (data["h_mid"] - (3*data["gh"])) / 2
-    data["mh"] = 56
+    data["mh"] = 44
     data["mv"] = 5
     data["gap"] = 5
     data["gap_m"] = 14 # data["gh"]
 
     data["air_material"] = "Air"
     data["core_material"] = "416 Stainless Steel"
+    # data["core_material"] = "Aluminum, 1100"
     # data["magnet_material"] = "N52"
     data["magnet_material"] = "N40"
     # data["magnet_material"] = "N30"
@@ -356,45 +409,46 @@ if __name__ == "__main__":
     # data["coil_material"] = "0.4mm"
     # data["coil_material"] = "0.5mm"
     # data["coil_material"] = "0.63mm"
-    # data["coil_material"] = "0.8mm"
+    data["coil_material"] = "0.8mm"
     # data["coil_material"] = "1mm"
     # data["coil_material"] = "1.25mm"
     # data["coil_material"] = "1.6mm"
 
-    data["coil_material"] = ["Aluminium 0.8mm", [
-                        1,  # mu x, 1 for non-magnetic
-                        1,  # mu y, 1 for non-magnetic
-                        0,  # coercivity (Hc), 0 for non-magnetic
-                        10, # J Applied source current density in Amps/mm2
-                        35,  # Cduct Electrical conductivity of the material in MS/m.
-                        0.03,  # lam_d (for lamination, 0 if not laminated)
-                        0,  # Phi hmax Hysteresis lag angle in degrees, used for nonlinear BH curves
-                        0,  # Lam fill Fraction of the volume occupied per lamination that is actually filled with iron (Note
-                            # that this parameter defaults to 1 in the femm preprocessor dialog box because, by default,
-                            # iron completely fills the volume)
-                        3,  # Lamtype Set to
-                                # ∗ 0 – Not laminated or laminated in plane
-                                # ∗ 1 – laminated x or r
-                                # ∗ 2 – laminated y or z
-                                # ∗ 3 – magnet wire
-                                # ∗ 4 – plain stranded wire
-                                # ∗ 5 – Litz wire
-                                # ∗ 6 – square wire
-                        0, # Phi hx Hysteresis lag in degrees in the x-direction for linear problems.
-                        0, # Phi hy Hysteresis lag in degrees in the y-direction for linear problems.
-                        1, # nstr Number of strands in the wire build. Should be 1 for Magnet or Square wire.
-                        0.8, # dwire Diameter of each of the wire’s constituent strand in millimeters.
-    ]]
+    # data["coil_material"] = ["Aluminium 0.8mm", [
+    #                     1,  # mu x, 1 for non-magnetic
+    #                     1,  # mu y, 1 for non-magnetic
+    #                     0,  # coercivity (Hc), 0 for non-magnetic
+    #                     10, # J Applied source current density in Amps/mm2
+    #                     35,  # Cduct Electrical conductivity of the material in MS/m.
+    #                     0.03,  # lam_d (for lamination, 0 if not laminated)
+    #                     0,  # Phi hmax Hysteresis lag angle in degrees, used for nonlinear BH curves
+    #                     0,  # Lam fill Fraction of the volume occupied per lamination that is actually filled with iron (Note
+    #                         # that this parameter defaults to 1 in the femm preprocessor dialog box because, by default,
+    #                         # iron completely fills the volume)
+    #                     3,  # Lamtype Set to
+    #                             # ∗ 0 – Not laminated or laminated in plane
+    #                             # ∗ 1 – laminated x or r
+    #                             # ∗ 2 – laminated y or z
+    #                             # ∗ 3 – magnet wire
+    #                             # ∗ 4 – plain stranded wire
+    #                             # ∗ 5 – Litz wire
+    #                             # ∗ 6 – square wire
+    #                     0, # Phi hx Hysteresis lag in degrees in the x-direction for linear problems.
+    #                     0, # Phi hy Hysteresis lag in degrees in the y-direction for linear problems.
+    #                     1, # nstr Number of strands in the wire build. Should be 1 for Magnet or Square wire.
+    #                     0.8, # dwire Diameter of each of the wire’s constituent strand in millimeters.
+    # ]]
 
     data["n_turns"] = number_of_turns(data["ch"], data["cv"], 0.8)
 
 
     data["magnet_density"] = 7.5 / 1000
-    data["iron_density"] = 7.8 / 1000
-    data["coil_mat_density"] = 2.7 / 1000  # aluminium
-    # data["coil_mat_density"] = 8.96 / 1000  # copper
-    data["coil_mat_specific_heat"] = 910 # Dj/(kg*K)   Aluminium
-    # data["coil_mat_specific_heat"] = 385 # Dj/(kg*K)   Copper
+    data["core_density"] = 7.8 / 1000  # ferrite
+    # data["core_density"] = 2.7 / 1000  # aluminium
+    # data["coil_mat_density"] = 2.7 / 1000  # aluminium
+    data["coil_mat_density"] = 8.96 / 1000  # copper
+    # data["coil_mat_specific_heat"] = 910 # Dj/(kg*K)   Aluminium
+    data["coil_mat_specific_heat"] = 385 # Dj/(kg*K)   Copper
 
     result = main(data)
 
