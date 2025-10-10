@@ -17,7 +17,7 @@ Results
 ```
 Input data:
 {
-    "battery_I": 1.25, // 15/12 parallel coils connection
+    "battery_I": 1.25,
     "battery_V": 48,
     "battery_P": 60.0,
     "depth": 31.7,
@@ -36,9 +36,9 @@ Input data:
     "gap_m": 14,
     "air_material": "Air",
     "core_material": "416 Stainless Steel",
-    "magnet_material": "N40",
-    "coil_material": "0.8mm",  // copper
-    "n_turns": 560,
+    "magnet_material": "N52",
+    "coil_material": "0.63mm",
+    "n_turns": 900,
     "magnet_density": 0.0075,
     "core_density": 0.0078,
     "coil_mat_density": 0.008960000000000001,
@@ -48,17 +48,17 @@ Input data:
 Results:
 {
     "From calculation (Unlimited battery)": {
-        "V_drop": 18.27,
+        "V_drop": 47.34,
         "I": 1.25,
-        "P": 22.83,
-        "Fx": 75.36,
-        "delta T for 60sec 1 coil (vacuum)": 5.95
+        "P": 59.17,
+        "Fx": 138.75,
+        "delta T for 60sec 1 coil (vacuum)": 15.41
     },
     "Limited by battery": {
         "V": 48,
         "I": 1.25,
         "P": 60.0,
-        "Fx": 198.01,
+        "Fx": 140.69,
         "delta T for 60sec 1 coil (vacuum)": 15.62
     },
     "Weights": {

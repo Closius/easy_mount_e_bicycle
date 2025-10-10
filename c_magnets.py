@@ -236,24 +236,6 @@ def main(data):
     x_m = ((data["H"]/2) + data["ch"] + (1.5 * data["gh"]))
     y_m = (data["mv"] / 2) + data["gap"] + data["V"] + data["gv"]
 
-    # femm.mi_selectlabel(*cbg["core_top_label"])
-    # femm.mi_selectlabel(*cbg["core_bttm_label"])
-    # femm.mi_selectlabel(*cbg["magn_left_label"])
-    # femm.mi_selectlabel(*cbg["magn_right_label"])
-    # femm.mi_selectlabel(*cbg["coil_top_1_label"])
-    # femm.mi_selectlabel(*cbg["coil_top_4_label"])
-    # femm.mi_selectlabel(*cbg["coil_bttm_2_label"])
-    # femm.mi_selectlabel(*cbg["coil_bttm_3_label"])
-    # femm.mi_selectlabel(*cbg["coil_top_2_label"])
-    # femm.mi_selectlabel(*cbg["coil_top_3_label"])
-    # femm.mi_selectlabel(*cbg["coil_bttm_1_label"])
-    # femm.mi_selectlabel(*cbg["coil_bttm_4_label"])
-
-    # femm.mi_mirror(x_m, - y_m, x_m, y_m)
-    # femm.mi_mirror(- x_m, - y_m, - x_m, y_m)
-    # femm.mi_clearselected()
-
-    # all
     femm.mi_selectrectangle(- x_m,y_m,x_m,- y_m,4)
     femm.mi_mirror2(x_m, - y_m, x_m, y_m,1)
     femm.mi_clearselected()
@@ -401,15 +383,15 @@ if __name__ == "__main__":
     data["air_material"] = "Air"
     data["core_material"] = "416 Stainless Steel"
     # data["core_material"] = "Aluminum, 1100"
-    # data["magnet_material"] = "N52"
-    data["magnet_material"] = "N40"
+    data["magnet_material"] = "N52"
+    # data["magnet_material"] = "N40"
     # data["magnet_material"] = "N30"
     # data["coil_material"] = "0.25mm"
     # data["coil_material"] = "0.315mm"
     # data["coil_material"] = "0.4mm"
     # data["coil_material"] = "0.5mm"
-    # data["coil_material"] = "0.63mm"
-    data["coil_material"] = "0.8mm"
+    data["coil_material"] = "0.63mm"
+    # data["coil_material"] = "0.8mm"
     # data["coil_material"] = "1mm"
     # data["coil_material"] = "1.25mm"
     # data["coil_material"] = "1.6mm"
@@ -439,7 +421,7 @@ if __name__ == "__main__":
     #                     0.8, # dwire Diameter of each of the wire’s constituent strand in millimeters.
     # ]]
 
-    data["n_turns"] = number_of_turns(data["ch"], data["cv"], 0.8)
+    data["n_turns"] = number_of_turns(data["ch"], data["cv"], 0.63)
 
 
     data["magnet_density"] = 7.5 / 1000
