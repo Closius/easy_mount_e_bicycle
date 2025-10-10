@@ -24,20 +24,21 @@ Input data:
     "V": 40,
     "H": 79.8,
     "h_leg": 22.3,
-    "v_leg": 25,
+    "v_leg": 35,
     "gv": 1.0,
     "gh": 1.0,
     "h_mid": 35.199999999999996,
-    "cv": 23.0,
+    "cv": 33.0,
     "ch": 16.099999999999998,
     "mh": 44,
-    "mv": 5,
+    "mv": 10,
     "gap": 5,
     "gap_m": 14,
     "air_material": "Air",
     "core_material": "416 Stainless Steel",
     "magnet_material": "N52",
     "coil_material": "0.63mm",
+    "coil_diameter": 0.63,
     "n_turns": 900,
     "magnet_density": 0.0075,
     "core_density": 0.0078,
@@ -51,21 +52,21 @@ Results:
         "V_drop": 47.34,
         "I": 1.25,
         "P": 59.17,
-        "Fx": 138.75,
-        "delta T for 60sec 1 coil (vacuum)": 15.41
+        "Fx": 252.08,
+        "delta T for 60sec 1 coil (vacuum)": 21.28
     },
     "Limited by battery": {
         "V": 48,
         "I": 1.25,
         "P": 60.0,
-        "Fx": 140.69,
-        "delta T for 60sec 1 coil (vacuum)": 15.62
+        "Fx": 255.59,
+        "delta T for 60sec 1 coil (vacuum)": 21.58
     },
     "Weights": {
-        "magnet_on_wheel_weight (for 32 spokes) (kg)": 1.62,
-        "U_core_weight (6 items) (kg)": 3.43,
-        "coil_weight (12 items) (kg) calculated as solid block": 7.18,
-        "total witout battery (kg)": 12.23
+        "magnet_on_wheel_weight (for 32 spokes) (kg)": 3.24,
+        "U_core_weight (6 items) (kg)": 2.91,
+        "coil_weight (12 items) (kg) calculated by turns": 5.2,
+        "total witout battery (kg)": 11.35
     }
 }
 

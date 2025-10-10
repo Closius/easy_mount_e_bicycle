@@ -11,6 +11,15 @@ def number_of_turns(w, h, d):
     h_t = math.floor(h/d)
     return w_t * h_t
 
+def weight_coil(ro, d_wire, n_turns, h_leg, ch, cv, depth):
+    area_wire = n_turns * math.pi * (d_wire * d_wire / 4)
+    area_solid = ch * cv
+    fill_coef = area_wire / area_solid
+    area_solid_cs = ( ((h_leg + (2*ch)) * (depth+ 2*ch)) - (h_leg * depth) )
+    area_wire_cs = area_solid_cs * fill_coef
+    weight = area_wire_cs * cv * ro / 1000
+    return weight
+
 
 def c_block_geometry(V, H, h_leg, v_leg, gv, gh, h_mid, cv, ch, mh, mv, gap, gap_m):
     # In local coordinates, origin - left bottom
@@ -242,6 +251,7 @@ def main(data):
     femm.mi_selectrectangle(- x_m,y_m,x_m,- y_m,4)
     femm.mi_mirror2(x_m, - y_m, x_m, y_m,2)
     femm.mi_clearselected()
+
     femm.mi_selectrectangle(- x_m,y_m,x_m,- y_m,4)
     femm.mi_mirror2(- x_m, - y_m, - x_m, y_m,1)
     femm.mi_clearselected()
@@ -278,16 +288,16 @@ def main(data):
 
     m_right_1 = list(copy.deepcopy(cbg["magn_right_label"]))
     m_right_1[0] = x_m + (x_m - m_right_1[0])
+    femm.mo_selectblock(*m_right_1)
     m_right_2 = list(copy.deepcopy(cbg["magn_left_label"]))
     m_right_2[0] = x_m + x_m + abs(m_right_2[0])
-    femm.mo_selectblock(*m_right_1)
     femm.mo_selectblock(*m_right_2)
 
     m_left_1 = copy.deepcopy(m_right_1)
     m_left_1[0] = - m_left_1[0]
+    femm.mo_selectblock(*m_left_1)
     m_left_2 = copy.deepcopy(m_right_2)
     m_left_2[0] = - m_left_2[0]
-    femm.mo_selectblock(*m_left_1)
     femm.mo_selectblock(*m_left_2)
 
 
@@ -296,9 +306,14 @@ def main(data):
     magnet_on_wheel_weight =  data["depth"] * data["mh"] * data["mv"] * data["magnet_density"] / 1000
     U_core_weight =  ((data["depth"] * data["V"] * data["H"]) - 
         (data["depth"] * data["v_leg"] * data["h_mid"])) * data["core_density"] / 1000
-    coil_weight = ((
-        (data["h_leg"] + (2*data["gh"]) + (2*data["ch"])) * (data["depth"] + (2*data["gh"]) + (2*data["ch"]))) -
-        ((data["h_leg"] + (2*data["gh"])) * (data["depth"] + (2*data["gh"])))) * data["cv"] * data["coil_mat_density"] / 1000
+
+    coil_weight = weight_coil(ro=data["coil_mat_density"], 
+        d_wire=data["coil_diameter"], 
+        n_turns=data["n_turns"], 
+        h_leg=data["h_leg"], 
+        ch=data["ch"],
+        cv=data["cv"],
+        depth=data["depth"])
 
     # temp of coil in 1 seconds
     delta_T_1sec_P_out = (P_out / (coil_weight * data["coil_mat_specific_heat"]))
@@ -334,7 +349,7 @@ def main(data):
     result["Weights"] = {
         "magnet_on_wheel_weight (for 32 spokes) (kg)": magnet_on_wheel_weight * (32 - 1),
         "U_core_weight (6 items) (kg)": U_core_weight * 6,
-        "coil_weight (12 items) (kg) calculated as solid block": coil_weight * 12,
+        "coil_weight (12 items) (kg) calculated by turns": coil_weight * 12,
         "total witout battery (kg)": (magnet_on_wheel_weight * (32 - 1)) + (U_core_weight * 6) + (coil_weight * 12)
     }
 
@@ -369,14 +384,14 @@ if __name__ == "__main__":
     data["V"] = 40
     data["H"] = 79.8
     data["h_leg"] = 22.3 # (data["H"] / 4)
-    data["v_leg"] = 25
+    data["v_leg"] = 35
     data["gv"] = 1.0
     data["gh"] = 1.0
     data["h_mid"] = data["H"] - (2 * data["h_leg"])
     data["cv"] = data["v_leg"] - (2*data["gv"])
     data["ch"] = (data["h_mid"] - (3*data["gh"])) / 2
     data["mh"] = 44
-    data["mv"] = 5
+    data["mv"] = 10
     data["gap"] = 5
     data["gap_m"] = 14 # data["gh"]
 
@@ -391,6 +406,7 @@ if __name__ == "__main__":
     # data["coil_material"] = "0.4mm"
     # data["coil_material"] = "0.5mm"
     data["coil_material"] = "0.63mm"
+    data["coil_diameter"] = 0.63
     # data["coil_material"] = "0.8mm"
     # data["coil_material"] = "1mm"
     # data["coil_material"] = "1.25mm"
@@ -421,7 +437,7 @@ if __name__ == "__main__":
     #                     0.8, # dwire Diameter of each of the wire’s constituent strand in millimeters.
     # ]]
 
-    data["n_turns"] = number_of_turns(data["ch"], data["cv"], 0.63)
+    data["n_turns"] = 900 # number_of_turns(data["ch"], data["cv"], data["coil_diameter"]) # 900
 
 
     data["magnet_density"] = 7.5 / 1000
