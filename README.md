@@ -83,3 +83,7 @@ Best for             Commuting, leisure  More oomph,heavier work         Off-roa
 ![definition](./results/definition.png)
 
 ![fields](./results/field.png)
+
+When the power is turned off. When the wheel is not shifted - Fx = 0. But when the wheel shifted on `"mh" / 2` and the power is switched off:
+
+![fields](./results/no_power.png)

@@ -18,6 +18,9 @@ def weight_coil(ro, d_wire, n_turns, h_leg, ch, cv, depth):
     area_solid_cs = ( ((h_leg + (2*ch)) * (depth+ 2*ch)) - (h_leg * depth) )
     area_wire_cs = area_solid_cs * fill_coef
     weight = area_wire_cs * cv * ro / 1000
+    print(f"weight coil solid: {area_solid_cs * cv * ro / 1000}, for 12: {12 * area_solid_cs * cv * ro / 1000}")
+    print(f"weight coil turns: {weight}, for 12: {12 * weight}")
+
     return weight
 
 
